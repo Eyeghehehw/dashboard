@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-KjvzoYnYmBfRjjuerWrZpFm2shqVqYVAXtFpRzyQf14=' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://i.imgur.com; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<title>Aqua Mais | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<style>
+:root{--bg:#eef8fc;--card:#fff;--soft:#f7fcff;--text:#234;--muted:#6b7f92;--line:#e3edf3;--azul:#1697df;--ciano:#18c5d9;--verde:#2ecc71;--laranja:#f39c12;--vermelho:#e74c3c;--sombra:0 5px 18px rgba(0,0,0,.06);--ease:cubic-bezier(.2,.8,.2,1)}
+html[data-theme=dark]{--bg:#0f1722;--card:#182433;--soft:#1e2c3d;--text:#e8f1f8;--muted:#9bb0c3;--line:#2c3f56;--sombra:0 5px 18px rgba(0,0,0,.35)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Poppins,system-ui,sans-serif}
+html{scroll-padding-top:20px}
+@media(prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{background:var(--bg);color:var(--text);transition:background .4s,color .4s}
+:focus-visible{outline:3px solid var(--ciano);outline-offset:2px}
+button{font:inherit;cursor:pointer}
+
+/* ENTRADA */
+#intro{position:fixed;inset:0;z-index:2000;display:grid;place-items:center;overflow:hidden;color:#fff;background:linear-gradient(160deg,#0d84c7,#18c5d9);animation:sai .8s 2.1s cubic-bezier(.7,0,.3,1) forwards}
+.intro-centro{position:relative;z-index:2;text-align:center;display:grid;justify-items:center;gap:12px}
+.intro-centro h2{font-size:42px;letter-spacing:.5px;animation:sobe .7s .5s var(--ease) both}
+.intro-centro p{font-weight:300;animation:sobe .7s .75s var(--ease) both}
+.anel{position:absolute;top:42px;width:90px;height:90px;border:2px solid rgba(255,255,255,.7);border-radius:50%;animation:anel 1.8s ease-out infinite}
+.anel.a2{animation-delay:.6s}
+.onda{position:absolute;left:-10%;right:-10%;bottom:0;height:0;background:rgba(255,255,255,.16);border-radius:50% 50% 0 0/40px;animation:enche 2.1s ease-in-out forwards}
+@keyframes anel{from{transform:scale(.6);opacity:1}to{transform:scale(3.2);opacity:0}}
+@keyframes enche{to{height:62%}}
+@keyframes sobe{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes sai{to{transform:translateY(-100%)}}
+@keyframes pop{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+
+/* LAYOUT */
+.sidebar{width:260px;height:100vh;position:fixed;background:var(--card);box-shadow:0 8px 25px rgba(0,0,0,.08);padding:25px;z-index:10;transition:background .4s}
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:36px}
+.logo h2{color:var(--azul);font-size:25px}
+.logo-box{width:55px;height:55px;flex:none;border-radius:14px;background:linear-gradient(135deg,var(--azul),var(--ciano));color:#fff;display:grid;place-items:center;font-size:24px;overflow:hidden;animation:pop .8s .1s cubic-bezier(.2,1.4,.4,1) both}
+.logo-box img{width:100%;height:100%;object-fit:contain;background:#fff}
+.logo-box.grande{width:96px;height:96px;font-size:42px;border-radius:24px;background:#fff;color:var(--azul);animation-delay:.1s}
+.menu{display:flex;flex-direction:column;gap:8px}
+.menu a{text-decoration:none;color:var(--muted);padding:13px 14px;border-radius:12px;transition:background .25s,color .25s,transform .25s var(--ease)}
+.menu a:hover{background:var(--azul);color:#fff;transform:translateX(4px)}
+.menu a.ativo{background:color-mix(in srgb,var(--azul) 14%,transparent);color:var(--azul);font-weight:600}
+.menu a.ativo:hover{background:var(--azul);color:#fff}
+.menu i{width:25px}
+.main{margin-left:260px;min-width:0}
+header{background:var(--card);padding:22px 40px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;box-shadow:0 2px 15px rgba(0,0,0,.05);position:sticky;top:0;z-index:5;transition:background .4s}
+header h1{font-size:28px;color:var(--azul)}
+.usuario{display:flex;align-items:center;gap:15px}
+.usuario small{color:var(--muted)}
+.avatar{width:45px;height:45px;background:var(--ciano);border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600}
+.filtro{display:flex;gap:6px;background:var(--soft);padding:5px;border-radius:14px;flex-wrap:wrap}
+.filtro button{border:0;background:transparent;color:var(--muted);padding:9px 16px;border-radius:10px;transition:background .25s,color .25s,transform .2s}
+.filtro button:hover{color:var(--azul)}
+.filtro button:active{transform:scale(.94)}
+.filtro button[aria-pressed=true]{background:var(--azul);color:#fff;box-shadow:0 4px 12px rgba(22,151,223,.4)}
+.dashboard{padding:35px;display:grid;gap:35px}
+.painel,.grafico,.card{background:var(--card);border-radius:18px;box-shadow:var(--sombra);transition:background .4s,transform .25s var(--ease)}
+.painel{padding:30px}
+.painel>.topo{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:25px}
+h2.t{color:var(--azul);font-size:21px}
+h3{font-size:16px;margin-bottom:14px}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px}
+.card{padding:24px}
+.card:hover{transform:translateY(-5px)}
+.card h3{font-size:14px;font-weight:500;color:var(--muted);margin:0}
+.valor{font-size:34px;font-weight:700;margin-top:8px;color:var(--azul);font-variant-numeric:tabular-nums}
+.sub{margin-top:6px;font-size:13px;color:var(--muted)}
+.sub.up{color:var(--verde)}.sub.down{color:var(--vermelho)}
+
+/* GRAFICOS */
+.graficos{display:grid;grid-template-columns:repeat(2,1fr);gap:25px}
+.grafico{padding:25px;min-width:0}
+.grafico.grande{grid-column:span 2}
+.grafico h2{color:var(--azul);font-size:19px;margin-bottom:4px}
+.grafico p{color:var(--muted);font-size:13px;margin-bottom:14px}
+.cv{position:relative;height:320px}
+
+/* TABELAS */
+.tabela{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+thead{background:var(--azul);color:#fff}
+th{padding:14px;text-align:left;font-weight:600;white-space:nowrap}
+th:first-child{border-radius:10px 0 0 10px}th:last-child{border-radius:0 10px 10px 0}
+td{padding:15px 14px;border-bottom:1px solid var(--line)}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:color-mix(in srgb,var(--azul) 7%,transparent)}
+td.vazio{text-align:center;color:var(--muted);padding:30px}
+.status{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;display:inline-block;white-space:nowrap}
+.entregue{background:rgba(46,204,113,.18);color:#1f9d57}
+.transporte{background:rgba(22,151,223,.18);color:#1288cc}
+.pendente{background:rgba(243,156,18,.2);color:#c97d0a}
+html[data-theme=dark] .entregue{color:#5fe39a}html[data-theme=dark] .transporte{color:#6cc4f5}html[data-theme=dark] .pendente{color:#f7b955}
+.acoes{display:flex;gap:12px;flex-wrap:wrap}
+input,select{padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--text);outline-offset:2px}
+.btn{background:var(--azul);color:#fff;border:0;padding:12px 20px;border-radius:10px;font-weight:600;transition:background .25s,transform .2s var(--ease),box-shadow .25s}
+.btn:hover{background:#0d84c7;transform:translateY(-2px);box-shadow:0 8px 18px rgba(22,151,223,.35)}
+.btn:active{transform:scale(.96)}
+.btn.ciano{background:var(--ciano)}
+
+/* VENDAS / LOGISTICA */
+.mini{background:var(--soft);padding:20px;border-radius:15px}
+.mini small{color:var(--muted)}
+.mini h3{margin:8px 0;color:var(--azul);font-size:24px;font-variant-numeric:tabular-nums}
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:25px;margin-top:28px}
+.grid2.b{grid-template-columns:1.5fr 1fr}
+.caixa{background:var(--soft);padding:22px;border-radius:15px;min-width:0}
+.barra{height:10px;background:var(--line);border-radius:20px;overflow:hidden;margin:10px 0}
+.progresso{height:100%;width:0;border-radius:20px;transition:width 1.1s var(--ease)}
+.verde{background:var(--verde)}.azul{background:var(--azul)}.laranja{background:var(--laranja)}
+.mapa-box{height:230px;display:flex;justify-content:space-around;align-items:center;position:relative}
+.cidade{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 3px 10px rgba(0,0,0,.1);text-align:center;z-index:2;display:grid;gap:4px}
+.cidade small{color:var(--muted)}
+.linha{position:absolute;height:6px;width:46%;background:linear-gradient(90deg,var(--azul),var(--verde));border-radius:20px;overflow:hidden}
+.linha::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),transparent);transform:translateX(-100%);animation:fluxo 1.8s linear infinite}
+@keyframes fluxo{to{transform:translateX(100%)}}
+
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+.hbtn{background:var(--soft);border:0;color:var(--text);width:42px;height:42px;border-radius:12px;position:relative;transition:background .25s,color .25s,transform .2s}
+.hbtn:hover{background:var(--azul);color:#fff}.hbtn:active{transform:scale(.92)}
+.badge{position:absolute;top:-5px;right:-5px;background:var(--vermelho);color:#fff;font-size:11px;border-radius:10px;padding:1px 6px}
+.badge[hidden]{display:none}
+#alertas{position:absolute;right:40px;top:78px;width:330px;max-width:calc(100% - 30px);background:var(--card);border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,.28);padding:16px;display:none;gap:8px;z-index:50}
+#alertas.on{display:grid;animation:pop .3s var(--ease)}
+button.alerta{border:0;color:var(--text);text-align:left;width:100%;padding:11px 13px;border-radius:10px;background:var(--soft);font-size:13px;transition:transform .2s}
+button.alerta:hover{transform:translateX(4px)}
+#tabsMetrica{margin:6px 0 12px;width:fit-content;max-width:100%}
+.metas{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px}
+.meta{text-align:center;display:grid;gap:4px;justify-items:center}
+.aro{--p:0;width:120px;height:120px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--c,var(--azul)) calc(var(--p)*1%),var(--line) 0);transition:--p 1.2s var(--ease)}
+.aro b{width:92px;height:92px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:22px;color:var(--text)}
+.meta small{color:var(--muted);font-size:12px}
+.ins{list-style:none;display:grid;gap:10px}
+.ins button,.ins li.f{width:100%;text-align:left;background:var(--soft);border:0;color:var(--text);padding:13px 16px;border-radius:12px;display:flex;gap:12px;align-items:center;font-size:14px}
+.ins button{transition:transform .2s var(--ease),box-shadow .2s}
+.ins button:hover{transform:translateX(6px);box-shadow:0 6px 16px rgba(22,151,223,.18)}
+.ins i{color:var(--azul);width:20px;text-align:center}
+.ins li.f small{margin-left:auto;color:var(--muted);white-space:nowrap}
+.spark{display:block;margin-top:10px;width:100%;height:34px}
+tbody tr.clk{cursor:pointer}
+dialog{border:0;border-radius:20px;padding:28px;max-width:420px;width:92%;background:var(--card);color:var(--text);box-shadow:0 30px 80px rgba(0,0,0,.4);margin:auto}
+dialog::backdrop{background:rgba(8,20,35,.55);backdrop-filter:blur(3px)}
+dialog[open]{animation:pop .35s var(--ease)}
+dialog h2{color:var(--azul);margin-bottom:12px}
+.dl-r{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid var(--line)}
+body.apres .sidebar{display:none}body.apres .main{margin-left:0}body.apres .valor{font-size:42px}
+#mapa{display:block;width:100%;height:auto;max-height:290px;overflow:visible}
+.rb{stroke:var(--azul);stroke-opacity:.2;stroke-width:4;transition:stroke-width .7s var(--ease)}
+.rd{stroke:var(--ciano);stroke-width:3.5;stroke-dasharray:.1 10;animation:marcha 1.2s linear infinite}
+@keyframes marcha{to{stroke-dashoffset:-10.1}}
+.pt{fill:var(--verde);stroke:var(--card);stroke-width:2}
+.cid{cursor:pointer;outline:none}
+.cid circle{fill:var(--card);stroke:var(--azul);stroke-width:3;transform-box:fill-box;transform-origin:center;transition:transform .25s var(--ease),fill .25s}
+.cid text{fill:var(--text);font-size:11px;font-weight:600;text-anchor:middle}
+.cid text.n{fill:var(--muted);font-size:10px;font-weight:400}
+.cid:hover circle,.cid:focus-visible circle{transform:scale(1.3)}
+.cid.sel circle,.hub circle{fill:var(--azul)}
+.hub circle.pulso{fill:var(--azul);opacity:.5;animation:pulso 2s ease-out infinite}
+@keyframes pulso{from{transform:scale(1);opacity:.5}to{transform:scale(2.6);opacity:0}}
+@media(prefers-reduced-motion:reduce){.pt,.pulso{display:none}}
+/* CONFIG */
+.config-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.config-grid .mini{display:grid;gap:12px;align-content:start}
+.config-grid input,.config-grid select,.config-grid .btn{width:100%}
+.dica{font-size:12px;color:var(--muted)}
+.dica.erro{color:var(--vermelho)}
+#relogio{font-size:30px;color:var(--azul);font-variant-numeric:tabular-nums}
+#toast{position:fixed;right:30px;bottom:30px;background:var(--azul);color:#fff;padding:15px 25px;border-radius:12px;box-shadow:0 10px 25px rgba(0,0,0,.25);z-index:999;opacity:0;transform:translateY(20px);pointer-events:none;transition:opacity .35s,transform .35s var(--ease)}
+#toast.on{opacity:1;transform:none}
+
+@media(max-width:900px){
+.sidebar{position:static;width:100%;height:auto;padding:16px}
+.logo{margin-bottom:14px}
+.menu{flex-direction:row;overflow-x:auto;padding-bottom:4px}
+.menu a{white-space:nowrap}
+.main{margin-left:0}
+header{position:static;padding:20px}
+.dashboard{padding:18px}
+.graficos,.grid2,.grid2.b{grid-template-columns:1fr}
+.grafico.grande{grid-column:auto}
+.painel{padding:20px}
+}
+@media(prefers-reduced-motion:reduce){#intro{display:none}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media print{#intro,.sidebar,.filtro,#toast{display:none!important}.main{margin:0}header{position:static}}
+</style>
+</head>
+<body>
+
+<div id="intro" aria-hidden="true">
+  <div class="onda"></div>
+  <div class="intro-centro">
+    <span class="anel"></span><span class="anel a2"></span>
+    <div class="logo-box grande" data-logo><i class="fa-solid fa-droplet"></i></div>
+    <h2>Aqua+</h2>
+    <p>Preparando seu painel</p>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-box" data-logo><i class="fa-solid fa-droplet"></i></div>
+    <h2>Aqua+</h2>
+  </div>
+  <nav class="menu" aria-label="Seções">
+    <a href="#dashboard" class="ativo"><i class="fa-solid fa-chart-line"></i>Dashboard</a>
+    <a href="#clientes"><i class="fa-solid fa-users"></i>Clientes</a>
+    <a href="#vendas"><i class="fa-solid fa-cart-shopping"></i>Vendas</a>
+    <a href="#logistica"><i class="fa-solid fa-truck"></i>Logística</a>
+    <a href="#config"><i class="fa-solid fa-gear"></i>Configurações</a>
+  </nav>
+</aside>
+
+<div class="main">
+  <header>
+    <div>
+      <h1>Dashboard Executivo</h1>
+      <small style="color:var(--muted)" id="periodo">Período: Junho a Setembro de 2026</small>
+    </div>
+    <div class="filtro" role="group" aria-label="Filtrar por mês" id="filtroMes"></div>
+    <div class="usuario">
+      <button class="btn" id="btnApr" type="button"><i class="fa-solid fa-expand"></i> Apresentar</button>
+      <button class="hbtn" id="btnBell" type="button" aria-label="Alertas" aria-expanded="false"><i class="fa-solid fa-bell"></i><span class="badge" id="badge">3</span></button>
+      <div><b>Aqua Mais</b></div><div class="avatar" aria-hidden="true">A+</div>
+    </div>
+    <div id="alertas" role="region" aria-label="Alertas"><h3>Alertas</h3></div>
+  </header>
+
+  <main class="dashboard">
+    <section id="dashboard" aria-label="Indicadores e gráficos">
+      <div class="cards">
+        <div class="card"><h3>Total de Clientes</h3><div class="valor" id="k-clientes">0</div><div class="sub" id="s-clientes"></div></div>
+        <div class="card"><h3>Vendas</h3><div class="valor" id="k-vendas">0</div><div class="sub" id="s-vendas"></div></div>
+        <div class="card"><h3>Faturamento</h3><div class="valor" id="k-fat">0</div><div class="sub" id="s-fat"></div></div>
+        <div class="card"><h3>Produtos Vendidos</h3><div class="valor" id="k-prod">0</div><div class="sub" id="s-prod"></div></div>
+        <div class="card"><h3>Pedidos em Andamento</h3><div class="valor" id="k-and">0</div><div class="sub" id="s-and"></div></div>
+        <div class="card"><h3>Crescimento</h3><div class="valor" id="k-cres">0</div><div class="sub" id="s-cres"></div></div>
+      </div>
+      <div class="graficos" style="margin-top:25px">
+        <div class="grafico"><h2>Resumo executivo</h2><p>Clique em um destaque para ir à análise.</p><ul class="ins" id="insights"></ul></div>
+        <div class="grafico"><h2>Metas do período</h2><p>Realizado em relação à meta.</p><div class="metas" id="metas"></div></div>
+      </div>
+      <div class="graficos" style="margin-top:25px">
+        <div class="grafico grande"><h2 id="tituloMain">Vendas por mês</h2><div class="filtro" id="tabsMetrica" role="group" aria-label="Métrica e tipo de gráfico"></div><p>Clique em uma barra para filtrar o painel por esse mês.</p><div class="cv"><canvas id="cVendas" role="img" aria-label="Vendas por mês"></canvas></div></div>
+        <div class="grafico"><h2>Novos Clientes</h2><p>Passe o mouse ou clique em um ponto.</p><div class="cv"><canvas id="cClientes" role="img" aria-label="Novos clientes por mês"></canvas></div></div>
+        <div class="grafico"><h2>Produtos Vendidos</h2><p>Clique na legenda para ocultar categorias.</p><div class="cv"><canvas id="cProdutos" role="img" aria-label="Produtos vendidos por categoria"></canvas></div></div>
+        <div class="grafico grande"><h2>Evolução do Faturamento</h2><p>Valores em milhões de reais.</p><div class="cv"><canvas id="cFat" role="img" aria-label="Evolução do faturamento"></canvas></div></div>
+        <div class="grafico"><h2>Vendas por cidade</h2><p>Clique em uma cidade para filtrar os clientes.</p><div class="cv"><canvas id="cCid" role="img" aria-label="Vendas por cidade"></canvas></div></div>
+        <div class="grafico"><h2>Atividade recente</h2><p>Últimos eventos da operação.</p><ul class="ins" id="feed"></ul></div>
+      </div>
+    </section>
+
+    <section class="painel" id="clientes">
+      <div class="topo">
+        <h2 class="t">Gerenciamento de Clientes</h2>
+        <div class="acoes">
+          <input type="search" id="busca" placeholder="Pesquisar cliente..." maxlength="60" autocomplete="off" aria-label="Pesquisar cliente">
+          <button class="btn ciano" id="btnCsv" type="button"><i class="fa-solid fa-download"></i> Exportar CSV</button><select id="cidade" aria-label="Filtrar por cidade"><option value="">Todas as cidades</option><option>Belo Horizonte</option><option>Contagem</option><option>Betim</option><option>Nova Lima</option><option>Sete Lagoas</option></select>
+        </div>
+      </div>
+      <div class="tabela"><table><thead><tr><th>Cliente</th><th>Cidade</th><th>Piscina</th><th>Compra</th><th>Valor</th><th>Status</th></tr></thead><tbody id="tbClientes"></tbody></table></div>
+    </section>
+
+    <section class="painel" id="vendas">
+      <div class="topo"><h2 class="t">Painel de Vendas</h2><button class="btn" id="btnExp" type="button"><i class="fa-solid fa-file-pdf"></i> Exportar relatório</button></div>
+      <div class="cards">
+        <div class="mini"><small>Faturamento</small><h3 id="v-fat">-</h3><span class="sub up">no período</span></div>
+        <div class="mini"><small>Ticket médio</small><h3 id="v-tk">-</h3><span class="sub up">faturamento ÷ vendas</span></div>
+        <div class="mini"><small>Vendas</small><h3 id="v-n">-</h3><span class="sub up">no período</span></div>
+        <div class="mini"><small>Conversão</small><h3>81%</h3><span class="sub up">▲ 4%</span></div>
+      </div>
+      <div class="grid2">
+        <div><h3>Histórico de Vendas</h3><div class="tabela"><table><thead><tr><th>Pedido</th><th>Cliente</th><th>Produto</th><th>Valor</th><th>Status</th></tr></thead><tbody id="tbVendas"></tbody></table></div></div>
+        <div class="caixa"><h3>Produtos Mais Vendidos</h3><div class="cv"><canvas id="cRank" role="img" aria-label="Ranking de produtos"></canvas></div></div>
+      </div>
+    </section>
+
+    <section class="painel" id="logistica">
+      <div class="topo"><h2 class="t">Centro Logístico</h2><span class="status transporte" id="logPeriodo">Junho a Setembro</span></div>
+      <div class="cards">
+        <div class="mini"><small>Pedidos entregues</small><h3 id="l-ent">0</h3><div class="barra"><div class="progresso verde" id="b-ent"></div></div><small id="p-ent"></small></div>
+        <div class="mini"><small>Em transporte</small><h3 id="l-tr">0</h3><div class="barra"><div class="progresso azul" id="b-tr"></div></div><small id="p-tr"></small></div>
+        <div class="mini"><small>Pendentes</small><h3 id="l-pe">0</h3><div class="barra"><div class="progresso laranja" id="b-pe"></div></div><small id="p-pe"></small></div>
+        <div class="mini"><small>Tempo médio de entrega</small><h3 id="l-tm">-</h3><div class="barra"><div class="progresso verde" id="b-tm"></div></div><small>meta: até 5 dias</small></div>
+      </div>
+      <div class="grid2 b">
+        <div class="caixa"><h3>Fluxo de Distribuição</h3><svg id="mapa" viewBox="0 0 400 250" role="group" aria-label="Rotas de distribuição a partir de Belo Horizonte">
+          <g fill="none" stroke-linecap="round"><path class="rb" id="r1" d="M70 125C150 125 175 38 300 38"/><path class="rb" id="r4" d="M70 125C190 125 250 108 340 100"/><path class="rb" id="r2" d="M70 125C150 125 200 195 310 172"/><path class="rb" id="r3" d="M70 125C95 185 150 222 235 220"/><path class="rd" d="M70 125C150 125 175 38 300 38"/><path class="rd" d="M70 125C190 125 250 108 340 100"/><path class="rd" d="M70 125C150 125 200 195 310 172"/><path class="rd" d="M70 125C95 185 150 222 235 220"/></g><circle class="pt" r="4"><animateMotion dur="3.0s" begin="0.0s" repeatCount="indefinite" path="M70 125C150 125 175 38 300 38"/></circle><circle class="pt" r="4"><animateMotion dur="3.6s" begin="0.7s" repeatCount="indefinite" path="M70 125C190 125 250 108 340 100"/></circle><circle class="pt" r="4"><animateMotion dur="4.2s" begin="1.4s" repeatCount="indefinite" path="M70 125C150 125 200 195 310 172"/></circle><circle class="pt" r="4"><animateMotion dur="4.8s" begin="2.1s" repeatCount="indefinite" path="M70 125C95 185 150 222 235 220"/></circle>
+          <g class="cid hub" data-c="Belo Horizonte" tabindex="0" role="button" aria-label="Filtrar clientes de Belo Horizonte" transform="translate(70 125)"><circle class="pulso" r="16"/><circle r="16"/><text y="-26">Centro de Distribuição</text><text class="n" id="n0" y="38">0 vendas</text></g>
+          <g class="cid" data-c="Contagem" tabindex="0" role="button" aria-label="Filtrar clientes de Contagem" transform="translate(300 38)"><circle r="10"/><text y="-17">Contagem</text><text class="n" id="n1" y="28">0 vendas</text></g><g class="cid" data-c="Sete Lagoas" tabindex="0" role="button" aria-label="Filtrar clientes de Sete Lagoas" transform="translate(340 100)"><circle r="10"/><text y="-17">Sete Lagoas</text><text class="n" id="n4" y="28">0 vendas</text></g><g class="cid" data-c="Betim" tabindex="0" role="button" aria-label="Filtrar clientes de Betim" transform="translate(310 172)"><circle r="10"/><text y="-17">Betim</text><text class="n" id="n2" y="28">0 vendas</text></g><g class="cid" data-c="Nova Lima" tabindex="0" role="button" aria-label="Filtrar clientes de Nova Lima" transform="translate(235 220)"><circle r="10"/><text y="-17">Nova Lima</text><text class="n" id="n3" y="28">0 vendas</text></g>
+        </svg>
+        <p class="dica" style="text-align:center">A espessura da rota mostra o volume de vendas. Clique em uma cidade para filtrar os clientes.</p></div>
+        <div class="caixa"><h3>Status dos Pedidos</h3><div class="cv" style="height:250px"><canvas id="cLog" role="img" aria-label="Status dos pedidos"></canvas></div></div>
+      </div>
+      <h3 style="margin-top:28px">Pedidos Recentes</h3>
+      <div class="tabela"><table><thead><tr><th>Pedido</th><th>Cliente</th><th>Cidade</th><th>Entrega</th><th>Status</th></tr></thead><tbody id="tbLog"></tbody></table></div>
+    </section>
+
+    <section class="painel" id="config">
+      <div class="topo"><h2 class="t">Configurações do Sistema</h2><button class="btn" id="btnTema" type="button"><i class="fa-solid fa-moon"></i> Tema escuro</button></div>
+      <div class="config-grid">
+        <div class="mini"><h3>Logo (Imgur)</h3>
+          <input type="url" id="logoUrl" placeholder="https://i.imgur.com/XXXXXXX.png" maxlength="120" aria-label="Link da logo no Imgur">
+          <button class="btn" id="btnLogo" type="button">Aplicar logo</button>
+          <span class="dica" id="logoMsg">Use o link direto da imagem (i.imgur.com).</span></div>
+        <div class="mini"><h3>Notificações</h3><button class="btn ciano" id="btnNot" type="button">Simular notificação</button></div>
+        <div class="mini"><h3>Atualização</h3><div id="relogio">--:--:--</div><small class="dica">Tempo real</small></div>
+      </div>
+    </section>
+  </main>
+</div>
+<dialog id="dlg" aria-labelledby="dT"><h2 id="dT"></h2><div id="dB"></div>
+  <div class="acoes" style="margin-top:20px"><button class="btn" id="dFiltra" type="button">Ver clientes da cidade</button><button class="btn ciano" id="dFecha" type="button">Fechar</button></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* >>> COLE AQUI o link direto da sua logo no Imgur (opcional, também dá para aplicar em Configurações) <<< */
+const LOGO_IMGUR = ""; // exemplo: "https://i.imgur.com/AbC123.png"
+
+const MESES = ["Jun","Jul","Ago","Set"], NOMES = ["Junho","Julho","Agosto","Setembro"];
+const D = {
+  vendas:[30,42,53,73], novos:[58,71,86,104], base:107, fat:[.48,.61,.74,1.01], prod:[96,128,163,225],
+  cats:["Piscinas","Bombas","Filtros","Acessórios","Químicos"],
+  mix:[[20,22,16,18,20],[26,29,22,24,27],[34,38,29,31,31],[48,52,43,40,42]],
+  log:[[29,1,0],[40,2,0],[48,4,1],[36,27,10]], tempo:[4.6,4.4,4.1,3.8]
+};
+const CLIENTES = [
+  ["Carlos Henrique","Belo Horizonte","Piscina de Fibra 8x4","08/06/2026","R$ 38.500","Entregue",0],
+  ["Fernanda Souza","Contagem","Piscina Vinil 7x3","19/06/2026","R$ 29.800","Em Transporte",0],
+  ["Ricardo Almeida","Betim","Piscina Concreto 9x4","02/07/2026","R$ 67.400","Entregue",1],
+  ["Juliana Costa","Nova Lima","Piscina Fibra Premium","14/08/2026","R$ 44.200","Pendente",2],
+  ["Marcos Oliveira","Sete Lagoas","Piscina Compacta","25/09/2026","R$ 24.900","Em Transporte",3],
+  ["Ana Paula","Belo Horizonte","Piscina Vinil Luxo","28/09/2026","R$ 49.300","Entregue",3]];
+const VENDAS = [
+  ["#AQ1021","Carlos Henrique","Piscina Fibra 8x4","R$ 38.500","Pago","entregue"],
+  ["#AQ1022","Fernanda Souza","Bomba Premium","R$ 5.900","Faturado","transporte"],
+  ["#AQ1023","Ricardo Almeida","Piscina Concreto","R$ 67.400","Pago","entregue"],
+  ["#AQ1024","Ana Paula","Piscina Premium","R$ 49.300","Aguardando","pendente"]];
+const RECENTES = [
+  ["#AQ1031","João Pedro","Belo Horizonte","03/09/2026","Entregue","entregue"],
+  ["#AQ1032","Marina Alves","Contagem","05/09/2026","Em Transporte","transporte"],
+  ["#AQ1033","Lucas Silva","Betim","07/09/2026","Separação","pendente"],
+  ["#AQ1034","Patrícia Souza","Nova Lima","08/09/2026","Entregue","entregue"]];
+Object.assign(D,{nc:["Belo Horizonte","Contagem","Betim","Nova Lima","Sete Lagoas"],cid:[[12,7,5,4,2],[17,10,8,4,3],[21,12,9,6,5],[29,16,13,8,7]]});
+const M={vendas:[35,45,55,70],fat:[.5,.6,.75,.95],novos:[55,70,85,100]};
+const MET={"Vendas":[D.vendas,"Vendas por mês"],"Faturamento":[D.fat,"Faturamento por mês (R$ milhões)"],"Novos clientes":[D.novos,"Novos clientes por mês"],"Produtos":[D.prod,"Produtos vendidos por mês"]};
+let met="Vendas",tipo="bar";
+const ALERTAS=[["Setembro tem 10 pedidos pendentes aguardando separação.","logistica"],["A meta de vendas de junho ficou 14% abaixo.","dashboard"],["O faturamento de setembro passou de R$ 1 Mi.","vendas"]];
+const FEED=[["fa-circle-check","Pedido #AQ1034 entregue em Nova Lima","há 2 h"],["fa-truck","Pedido #AQ1032 saiu para Contagem","há 5 h"],["fa-user-plus","Novo cliente cadastrado em Betim","ontem"],["fa-file-invoice-dollar","Pedido #AQ1023 pago: R$ 67.400","ontem"]];
+const CLASSE = {"Entregue":"entregue","Em Transporte":"transporte","Pendente":"pendente"};
+
+const $ = id => document.getElementById(id);
+const soma = a => a.reduce((x,y)=>x+y,0);
+const reduz = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const brl = n => "R$ " + Math.round(n).toLocaleString("pt-BR");
+let mes = -1; // -1 = todos os meses
+
+/* ---------- helpers de DOM seguros (sem innerHTML) ---------- */
+function el(tag, txt, cls){ const e=document.createElement(tag); if(txt!==undefined) e.textContent=txt; if(cls) e.className=cls; return e; }
+function linhas(tbody, rows){
+  tbody.replaceChildren(...rows.map(r=>{
+    const tr=document.createElement("tr");
+    r.cells.forEach(c=>tr.appendChild(el("td",c)));
+    const td=el("td"); td.appendChild(el("span",r.status[0],"status "+r.status[1])); tr.appendChild(td);
+    return tr;
+  }));
+}
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("on"); clearTimeout(toast.t); toast.t=setTimeout(()=>t.classList.remove("on"),3000); }
+function anima(id, fim, fmt){
+  const e=$(id), ini=parseFloat(e.dataset.v||0); e.dataset.v=fim;
+  if(reduz){ e.textContent=fmt(fim); return; }
+  const t0=performance.now();
+  (function f(t){ const p=Math.min((t-t0)/800,1), k=1-Math.pow(1-p,3); e.textContent=fmt(ini+(fim-ini)*k); if(p<1) requestAnimationFrame(f); })(t0);
+}
+function sub(id, txt, cls){ const e=$(id); e.textContent=txt; e.className="sub "+(cls||""); }
+
+/* ---------- logo via Imgur (somente https://i.imgur.com) ---------- */
+const RE_IMGUR = /^https:\/\/i\.imgur\.com\/[A-Za-z0-9_-]+\.(png|jpe?g|gif|webp|svg)$/i;
+function aplicarLogo(url){
+  if(!RE_IMGUR.test(url)) return false;
+  document.querySelectorAll("[data-logo]").forEach(box=>{
+    const img=new Image(); img.alt="Logo Aqua Mais"; img.referrerPolicy="no-referrer"; img.decoding="async";
+    img.onload=()=>box.replaceChildren(img); img.src=url;
+  });
+  return true;
+}
+
+/* ---------- gráficos ---------- */
+const AZ="#1697df", CI="#18c5d9", VE="#2ecc71";
+const CORES = ["#1697df","#22b8cf","#6ec6ff","#2ecc71","#9adcf8"];
+const dim = (cores,i) => cores.map((c,k)=> (mes<0||k===i) ? c : c+"55");
+const selecionar = i => { mes = (i===mes) ? -1 : i; render(); };
+const clique = (e,els)=>{ if(els.length) selecionar(els[0].index); };
+const hover = (e,els)=>{ e.native.target.style.cursor = els.length ? "pointer" : "default"; };
+const base = { responsive:true, maintainAspectRatio:false, onClick:clique, onHover:hover, animation:{duration:reduz?0:900,easing:"easeOutQuart"}, plugins:{legend:{display:false}} };
+const charts = {};
+function novo(id, cfg){ charts[id]=new Chart($(id), cfg); }
+
+function criarGraficos(){
+  novo("cVendas",{type:"bar",data:{labels:NOMES,datasets:[{label:"Vendas",data:D.vendas,borderRadius:10,backgroundColor:[]}]},options:{...base,scales:{y:{beginAtZero:true}}}});
+  novo("cClientes",{type:"line",data:{labels:NOMES,datasets:[{label:"Novos clientes",data:D.novos,borderColor:AZ,backgroundColor:"rgba(22,151,223,.15)",fill:true,tension:.4,pointHoverRadius:10}]},options:{...base,scales:{y:{beginAtZero:true}},interaction:{mode:"index",intersect:false}}});
+  novo("cProdutos",{type:"doughnut",data:{labels:D.cats,datasets:[{data:[],backgroundColor:CORES,borderWidth:0,hoverOffset:14}]},options:{...base,onClick:null,cutout:"58%",plugins:{legend:{position:"bottom"},tooltip:{callbacks:{label:c=>{const t=soma(c.dataset.data);return ` ${c.label}: ${c.raw} (${Math.round(c.raw/t*100)}%)`;}}}}}});
+  novo("cFat",{type:"line",data:{labels:NOMES,datasets:[{label:"Milhões (R$)",data:D.fat,borderColor:VE,backgroundColor:"rgba(46,204,113,.14)",fill:true,tension:.35,pointHoverRadius:10}]},options:{...base,scales:{y:{beginAtZero:true}},interaction:{mode:"index",intersect:false}}});
+  novo("cRank",{type:"bar",data:{labels:[],datasets:[{label:"Quantidade",data:[],borderRadius:8,backgroundColor:CORES}]},options:{...base,onClick:null,indexAxis:"y",scales:{x:{beginAtZero:true}}}});
+  novo("cLog",{type:"doughnut",data:{labels:["Entregues","Em transporte","Pendentes"],datasets:[{data:[],backgroundColor:[VE,AZ,"#f39c12"],borderWidth:0,hoverOffset:12}]},options:{...base,onClick:null,cutout:"66%",plugins:{legend:{position:"bottom"}}}});
+}
+function pontos(i){ return D.vendas.map((_,k)=>k===i?9:4); }
+
+/* ---------- render principal ---------- */
+function render(){
+  const i=mes, todos=i<0;
+  const rot = todos ? "Junho a Setembro" : NOMES[i];
+  $("periodo").textContent = "Período: " + rot + " de 2026";
+  $("logPeriodo").textContent = rot;
+  document.querySelectorAll("#filtroMes button").forEach(b=>b.setAttribute("aria-pressed", String(+b.dataset.m===i)));
+
+  const pick = a => todos ? soma(a) : a[i];
+  const vendas=pick(D.vendas), fat=pick(D.fat), prod=pick(D.prod);
+  const cli = todos ? D.base+soma(D.novos) : D.base+soma(D.novos.slice(0,i+1));
+  const lg = todos ? [0,1,2].map(k=>soma(D.log.map(m=>m[k]))) : D.log[i];
+  const ant = (a)=> i>0 ? a[i-1] : null;
+  const delta = (a)=>{ const p=ant(a); return p ? Math.round((a[i]/p-1)*100) : null; };
+  const txt = d => d===null ? "" : (d>=0?"▲ ":"▼ ")+Math.abs(d)+"% vs. mês anterior";
+  const cls = d => d===null ? "" : d>=0 ? "up":"down";
+
+  anima("k-clientes",cli,n=>Math.round(n).toLocaleString("pt-BR"));
+  anima("k-vendas",vendas,n=>Math.round(n).toLocaleString("pt-BR"));
+  anima("k-fat",fat,n=>"R$ "+n.toFixed(2).replace(".",",")+" Mi");
+  anima("k-prod",prod,n=>Math.round(n).toLocaleString("pt-BR"));
+  anima("k-and",lg[1]+lg[2],n=>Math.round(n).toLocaleString("pt-BR"));
+  const cres = todos ? Math.round((D.fat[3]/D.fat[0]-1)*100) : delta(D.fat);
+  anima("k-cres",cres===null?0:cres,n=>(cres===null?"—":"+"+Math.round(n)+"%"));
+
+  sub("s-clientes", todos?"acumulado até setembro":"acumulado até "+NOMES[i].toLowerCase());
+  sub("s-vendas", todos?"junho a setembro":txt(delta(D.vendas))||"primeiro mês da série", cls(todos?null:delta(D.vendas)));
+  sub("s-fat", todos?"junho a setembro":txt(delta(D.fat))||"primeiro mês da série", cls(todos?null:delta(D.fat)));
+  sub("s-prod", todos?"junho a setembro":txt(delta(D.prod))||"primeiro mês da série", cls(todos?null:delta(D.prod)));
+  sub("s-and", lg[2]+" pendentes", lg[2]?"down":"up");
+  sub("s-cres", todos?"junho → setembro":"faturamento vs. mês anterior", "up");
+
+  const cats = todos ? D.cats.map((_,k)=>soma(D.mix.map(m=>m[k]))) : D.mix[i];
+  $("v-fat").textContent = "R$ "+(fat*1e6).toLocaleString("pt-BR");
+  $("v-tk").textContent = brl(fat*1e6/vendas);
+  $("v-n").textContent = vendas;
+
+  const tot=soma(lg), nomes=["ent","tr","pe"];
+  nomes.forEach((n,k)=>{ $("l-"+n).textContent=lg[k]; const p=tot?Math.round(lg[k]/tot*100):0; $("b-"+n).style.width=p+"%"; $("p-"+n).textContent=p+"% dos pedidos"; });
+  const tm = todos ? soma(D.tempo)/4 : D.tempo[i];
+  $("l-tm").textContent = tm.toFixed(1).replace(".",",")+" dias"; $("b-tm").style.width=Math.round((1-tm/8)*100)+"%";
+
+  const c=charts;
+  const cv=c.cVendas, dv=cv.data.datasets[0], ln=tipo==="line";
+  cv.config.type=tipo; dv.data=MET[met][0]; dv.label=met; dv.borderColor=AZ; dv.borderWidth=ln?3:0; dv.fill=ln; dv.tension=.4; dv.pointRadius=ln?pontos(i):0;
+  dv.backgroundColor = ln ? "rgba(22,151,223,.15)" : dim(["#6ec6ff","#42bdf5","#22b8cf","#1697df"],i);
+  $("tituloMain").textContent=MET[met][1];
+  document.querySelectorAll("#tabsMetrica button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===met||b.dataset.k===tipo)));
+  c.cClientes.data.datasets[0].pointRadius = pontos(i);
+  c.cClientes.data.datasets[0].pointBackgroundColor = D.novos.map((_,k)=>k===i?"#0d5f94":AZ);
+  c.cFat.data.datasets[0].pointRadius = pontos(i);
+  c.cFat.data.datasets[0].pointBackgroundColor = D.fat.map((_,k)=>k===i?"#168a4d":VE);
+  c.cProdutos.data.datasets[0].data = cats;
+  const ord = D.cats.map((n,k)=>[n,cats[k]]).sort((a,b)=>b[1]-a[1]);
+  c.cRank.data.labels = ord.map(x=>x[0]); c.cRank.data.datasets[0].data = ord.map(x=>x[1]);
+  c.cLog.data.datasets[0].data = lg;
+  const cd = todos ? D.nc.map((_,k)=>soma(D.cid.map(m=>m[k]))) : D.cid[i], sel=$("cidade").value;
+  c.cCid.data.labels=D.nc; c.cCid.data.datasets[0].data=cd; c.cCid.data.datasets[0].backgroundColor=D.nc.map((n,k)=>(!sel||n===sel)?CORES[k]:CORES[k]+"44");
+  Object.values(c).forEach(ch=>ch.update());
+  const mx=a=>a.indexOf(Math.max(...a)), pc=(a,k)=>Math.round(a[k]/soma(a)*100), bm=mx(D.vendas), tc=mx(cd), tp=mx(cats);
+  $("insights").replaceChildren(...[
+    ["fa-trophy", todos ? `${NOMES[bm]} foi o melhor mês: ${D.vendas[bm]} vendas e R$ ${D.fat[bm].toFixed(2).replace(".",",")} Mi.` : `${NOMES[i]} fechou com ${vendas} vendas e ticket médio de ${brl(fat*1e6/vendas)}.`, "cVendas"],
+    ["fa-location-dot", `${D.nc[tc]} lidera com ${pc(cd,tc)}% das vendas.`, "cCid"],
+    ["fa-box", `${D.cats[tp]} é a categoria mais vendida (${pc(cats,tp)}% das unidades).`, "cProdutos"],
+    ["fa-truck", lg[2] ? `${lg[2]} pedidos pendentes pedem atenção na logística.` : "Nenhum pedido pendente na logística.", "logistica"]
+  ].map(([ic,t,id])=>{ const li=document.createElement("li"), b=el("button"); b.type="button"; b.append(el("i","","fa-solid "+ic),el("span",t)); b.addEventListener("click",()=>$(id).scrollIntoView({behavior:reduz?"auto":"smooth",block:"center"})); li.appendChild(b); return li; }));
+  const mt=a=>todos?soma(a):a[i], f2=n=>n.toFixed(2).replace(".",","), nv=pick(D.novos);
+  meta("v",vendas,mt(M.vendas),`${vendas} de ${mt(M.vendas)} vendas`);
+  meta("f",fat,mt(M.fat),`R$ ${f2(fat)} Mi de R$ ${f2(mt(M.fat))} Mi`);
+  meta("n",nv,mt(M.novos),`${nv} de ${mt(M.novos)} novos clientes`);
+  const vol=Math.max(...cd.slice(1)), selc=$("cidade").value;
+  D.nc.forEach((n,k)=>{ $("n"+k).textContent=cd[k]+" vendas"; if(k) $("r"+k).style.strokeWidth=(3+cd[k]/vol*8).toFixed(1); });
+  document.querySelectorAll(".cid").forEach(g=>g.classList.toggle("sel",g.dataset.c===selc));
+  renderClientes();
+}
+
+function btnTxt(b,ic,t){ b.replaceChildren(el("i","","fa-solid "+ic),document.createTextNode(" "+t)); }
+function meta(k,real,goal,txt){ const p=Math.round(real/goal*100),a=$("a-"+k); a.style.setProperty("--p",Math.min(p,100)); a.firstChild.textContent=p+"%"; $("t-"+k).textContent=txt+(p>=100?" (meta batida)":""); }
+function spark(id,arr){ const ns="http://www.w3.org/2000/svg",s=document.createElementNS(ns,"svg"),l=document.createElementNS(ns,"polyline"),mx=Math.max(...arr),mn=Math.min(...arr);
+  s.setAttribute("viewBox","0 0 100 30"); s.setAttribute("preserveAspectRatio","none"); s.setAttribute("aria-hidden","true"); s.classList.add("spark");
+  l.setAttribute("points",arr.map((v,k)=>(k*100/(arr.length-1))+","+(27-(v-mn)/((mx-mn)||1)*24)).join(" "));
+  [["fill","none"],["stroke","#18c5d9"],["stroke-width","2.5"],["vector-effect","non-scaling-stroke"]].forEach(a=>l.setAttribute(a[0],a[1]));
+  s.appendChild(l); $(id).parentElement.appendChild(s); }
+function filtrados(){
+  const q=$("busca").value.toLowerCase().trim(), cid=$("cidade").value;
+  return CLIENTES.filter(c=>(c[0].toLowerCase().includes(q)||c[2].toLowerCase().includes(q)) && (!cid||c[1]===cid) && (mes<0||c[6]===mes));
+}
+function abrir(c){
+  $("dT").textContent=c[0];
+  $("dB").replaceChildren(...[["Cidade",c[1]],["Piscina",c[2]],["Compra",c[3]],["Valor",c[4]],["Status",c[5]]].map(([k,v])=>{ const r=el("div","","dl-r"); r.append(el("span",k),el("b",v)); return r; }));
+  $("dFiltra").onclick=()=>{ $("cidade").value=c[1]; $("dlg").close(); render(); };
+  $("dlg").showModal();
+}
+function renderClientes(){
+  const f=filtrados(), tb=$("tbClientes");
+  if(!f.length){ const tr=document.createElement("tr"), td=el("td","Nenhum cliente encontrado. Ajuste a busca, a cidade ou o mês.","vazio"); td.colSpan=6; tr.appendChild(td); tb.replaceChildren(tr); return; }
+  linhas(tb, f.map(c=>({cells:c.slice(0,5), status:[c[5],CLASSE[c[5]]||""]})));
+  [...tb.rows].forEach((tr,k)=>{ tr.classList.add("clk"); tr.tabIndex=0; tr.title="Ver detalhes"; tr.addEventListener("click",()=>abrir(f[k])); tr.addEventListener("keydown",e=>{ if(e.key==="Enter") abrir(f[k]); }); });
+}
+
+/* ---------- inicialização ---------- */
+function init(){
+  const f=$("filtroMes");
+  [["Todos",-1],...MESES.map((m,k)=>[m,k])].forEach(([t,k])=>{
+    const b=el("button",t); b.type="button"; b.dataset.m=k; b.addEventListener("click",()=>{mes=k;render();}); f.appendChild(b);
+  });
+  Chart.defaults.font.family="Poppins, sans-serif";
+  criarGraficos();
+  novo("cCid",{type:"bar",data:{labels:D.nc,datasets:[{label:"Vendas",data:[],borderRadius:8,backgroundColor:CORES}]},options:{...base,indexAxis:"y",scales:{x:{beginAtZero:true}},onClick:(e,els)=>{ if(!els.length) return; const n=D.nc[els[0].index]; $("cidade").value=$("cidade").value===n?"":n; render(); }}});
+  const tabs=$("tabsMetrica");
+  [...Object.keys(MET),"bar","line"].forEach(k=>{ const b=el("button",k==="bar"?"Barras":k==="line"?"Linhas":k); b.type="button"; b.dataset.k=k; b.addEventListener("click",()=>{ if(k==="bar"||k==="line") tipo=k; else met=k; render(); }); tabs.appendChild(b); });
+  // metas, sparklines e atividade
+  const mm=$("metas"); [["v","Vendas","#1697df"],["f","Faturamento","#2ecc71"],["n","Novos clientes","#18c5d9"]].forEach(([k,n,c])=>{
+    const d=el("div","","meta"), a=el("div","","aro"); a.id="a-"+k; a.style.setProperty("--c",c); a.appendChild(el("b","0%")); const t=el("small"); t.id="t-"+k; d.append(a,el("strong",n),t); mm.appendChild(d); });
+  spark("k-clientes",D.novos.map((_,k)=>D.base+soma(D.novos.slice(0,k+1)))); spark("k-vendas",D.vendas); spark("k-fat",D.fat); spark("k-prod",D.prod); spark("k-and",D.log.map(m=>m[1]+m[2])); spark("k-cres",[0,27,21,36]);
+  $("feed").replaceChildren(...FEED.map(([ic,t,h])=>{ const li=el("li","","f"); li.append(el("i","","fa-solid "+ic),el("span",t),el("small",h)); return li; }));
+  // alertas
+  const ap=$("alertas"), bell=$("btnBell");
+  ALERTAS.forEach(([t,id])=>{ const b=el("button",t,"alerta"); b.type="button"; b.addEventListener("click",()=>{ ap.classList.remove("on"); $(id).scrollIntoView({behavior:reduz?"auto":"smooth",block:"start"}); }); ap.appendChild(b); });
+  const lido=el("button","Marcar todas como lidas","btn"); lido.type="button"; lido.addEventListener("click",()=>{ $("badge").hidden=true; ap.classList.remove("on"); }); ap.appendChild(lido);
+  bell.addEventListener("click",e=>{ e.stopPropagation(); ap.classList.toggle("on"); bell.setAttribute("aria-expanded",String(ap.classList.contains("on"))); });
+  document.addEventListener("click",e=>{ if(!ap.contains(e.target)) ap.classList.remove("on"); });
+  document.addEventListener("keydown",e=>{ if(e.key==="Escape") ap.classList.remove("on"); });
+  document.querySelectorAll(".cid").forEach(g=>{ const ir=()=>{ const n=g.dataset.c; $("cidade").value=$("cidade").value===n?"":n; render(); };
+    g.addEventListener("click",ir); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); ir(); } }); });
+  // detalhe do cliente
+  $("dFecha").addEventListener("click",()=>$("dlg").close());
+  $("dlg").addEventListener("click",e=>{ if(e.target===$("dlg")) $("dlg").close(); });
+  // exportar CSV (neutraliza fórmulas de planilha)
+  const csv=v=>{ v=String(v); if(/^[=+\-@\t\r]/.test(v)) v="'"+v; return '"'+v.replace(/"/g,'""')+'"'; };
+  $("btnCsv").addEventListener("click",()=>{
+    const txt=[["Cliente","Cidade","Piscina","Compra","Valor","Status"],...filtrados().map(c=>c.slice(0,6))].map(r=>r.map(csv).join(";")).join("\r\n");
+    const u=URL.createObjectURL(new Blob(["\ufeff"+txt],{type:"text/csv"})), a=el("a"); a.href=u; a.download="clientes-aqua-mais.csv"; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1000); toast("CSV exportado."); });
+  // modo apresentação
+  let apr=null; const ba=$("btnApr");
+  const fimApr=()=>{ clearInterval(apr); apr=null; document.body.classList.remove("apres"); btnTxt(ba,"fa-expand","Apresentar"); };
+  ba.addEventListener("click",()=>{
+    if(apr){ fimApr(); if(document.fullscreenElement) document.exitFullscreen(); return; }
+    document.body.classList.add("apres"); btnTxt(ba,"fa-stop","Parar"); toast("Modo apresentação: o mês muda a cada 6 segundos.");
+    try{ const p=document.documentElement.requestFullscreen(); if(p) p.catch(()=>{}); }catch(e){}
+    apr=setInterval(()=>{ mes=mes>=3?-1:mes+1; render(); },6000); });
+  document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElement&&apr) fimApr(); });
+  linhas($("tbVendas"), VENDAS.map(r=>({cells:r.slice(0,4),status:[r[4],r[5]]})));
+  linhas($("tbLog"), RECENTES.map(r=>({cells:r.slice(0,4),status:[r[4],r[5]]})));
+  $("busca").addEventListener("input",renderClientes);
+  $("cidade").addEventListener("change",render);
+  $("btnExp").addEventListener("click",()=>window.print());
+  $("btnNot").addEventListener("click",()=>toast("Sistema atualizado com sucesso."));
+
+  // logo
+  let salva=""; try{ salva=localStorage.getItem("aqua-logo")||""; }catch(e){}
+  aplicarLogo(salva||LOGO_IMGUR);
+  $("btnLogo").addEventListener("click",()=>{
+    const u=$("logoUrl").value.trim(), m=$("logoMsg");
+    if(aplicarLogo(u)){ try{localStorage.setItem("aqua-logo",u);}catch(e){} m.textContent="Logo aplicada."; m.className="dica"; }
+    else { m.textContent="Link inválido. Use o link direto: https://i.imgur.com/código.png"; m.className="dica erro"; }
+  });
+
+  // tema
+  const btn=$("btnTema");
+  function tema(t){
+    document.documentElement.dataset.theme=t;
+    const esc=t==="dark";
+    btn.replaceChildren(el("i","","fa-solid "+(esc?"fa-sun":"fa-moon")), document.createTextNode(esc?" Tema claro":" Tema escuro"));
+    Chart.defaults.color=esc?"#9bb0c3":"#6b7f92"; Chart.defaults.borderColor=esc?"#2c3f56":"#e3edf3";
+    Object.values(charts).forEach(c=>c.update());
+    try{localStorage.setItem("aqua-tema",t);}catch(e){}
+  }
+  let t="light"; try{ t=localStorage.getItem("aqua-tema")==="dark"?"dark":"light"; }catch(e){}
+  btn.addEventListener("click",()=>tema(document.documentElement.dataset.theme==="dark"?"light":"dark"));
+  Chart.defaults.color=t==="dark"?"#9bb0c3":"#6b7f92"; Chart.defaults.borderColor=t==="dark"?"#2c3f56":"#e3edf3";
+  document.documentElement.dataset.theme=t; if(t==="dark") tema("dark");
+
+  render();
+
+  // relógio
+  const rel=$("relogio"); const tick=()=>{rel.textContent=new Date().toLocaleTimeString("pt-BR");}; tick(); setInterval(tick,1000);
+
+  // menu ativo conforme a rolagem
+  const links=[...document.querySelectorAll(".menu a")];
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting) links.forEach(a=>a.classList.toggle("ativo",a.getAttribute("href")==="#"+e.target.id)); }),{rootMargin:"-40% 0px -55% 0px"});
+  document.querySelectorAll("main section[id]").forEach(s=>io.observe(s));
+
+  // entrada: remove a tela de abertura ao terminar (ou ao clicar)
+  const intro=$("intro"); if(intro){ const fim=()=>intro.remove(); intro.addEventListener("animationend",e=>{ if(e.animationName==="sai") fim(); }); intro.addEventListener("click",fim); setTimeout(fim,3400); }
+}
+if(typeof Chart==="undefined"){ document.body.prepend(el("p","Não foi possível carregar a biblioteca de gráficos. Verifique a conexão.")); } else init();
+</script>
+</body>
+</html>
